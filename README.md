@@ -244,8 +244,8 @@ All operational constants are centrally located at the top of [`main.py`](file:/
 
 ### 1. Clone Repository & Open Directory
 ```powershell
-git clone <repository-url>
-cd AeroClick
+git clone https://github.com/vedha-333/-AeroClick.git
+cd -AeroClick
 ```
 
 ### 2. Create and Activate Virtual Environment
