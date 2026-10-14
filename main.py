@@ -360,70 +360,72 @@ def draw_onboarding(frame, remaining):
 
     ov = frame.copy()
     cv2.rectangle(ov, (0, 0), (w, h), (8, 8, 18), -1)
-    cv2.addWeighted(ov, 0.52 * alpha, frame, 1 - 0.52 * alpha, 0, frame)
+    cv2.addWeighted(ov, 0.55 * alpha, frame, 1 - 0.55 * alpha, 0, frame)
 
-    cw, ch = 460, 370
+    cw, ch = 470, 360
     cx1, cy1 = w//2 - cw//2, h//2 - ch//2
     cx2, cy2 = cx1 + cw, cy1 + ch
 
     ov2 = frame.copy()
-    cv2.rectangle(ov2, (cx1, cy1), (cx2, cy2), (18, 16, 32), -1)
-    cv2.addWeighted(ov2, 0.90 * alpha, frame, 1 - 0.90 * alpha, 0, frame)
-    cv2.rectangle(frame, (cx1, cy1), (cx2, cy2), (90, 60, 150), 2, cv2.LINE_AA)
+    cv2.rectangle(ov2, (cx1, cy1), (cx2, cy2), (18, 16, 30), -1)
+    cv2.addWeighted(ov2, 0.92 * alpha, frame, 1 - 0.92 * alpha, 0, frame)
+    cv2.rectangle(frame, (cx1, cy1), (cx2, cy2), (110, 80, 160), 2, cv2.LINE_AA)
 
     # Title
-    title = "AeroClick  -  Gesture Guide"
-    tw = cv2.getTextSize(title, cv2.FONT_HERSHEY_DUPLEX, 0.70, 1)[0][0]
+    title = "AeroClick  •  Gesture Guide"
+    tw = cv2.getTextSize(title, cv2.FONT_HERSHEY_DUPLEX, 0.68, 1)[0][0]
     col_a = tuple(int(c * alpha) for c in ACCENT)
-    cv2.putText(frame, title, (w//2 - tw//2, cy1 + 34),
-                cv2.FONT_HERSHEY_DUPLEX, 0.70, col_a, 1, cv2.LINE_AA)
+    cv2.putText(frame, title, (w//2 - tw//2, cy1 + 32),
+                cv2.FONT_HERSHEY_DUPLEX, 0.68, col_a, 1, cv2.LINE_AA)
 
-    sub = "Keep your right hand visible inside the dashed box"
-    sw = cv2.getTextSize(sub, cv2.FONT_HERSHEY_SIMPLEX, 0.38, 1)[0][0]
-    cv2.putText(frame, sub, (w//2 - sw//2, cy1 + 56),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.38,
+    sub = "Keep your hand visible within the interaction guide"
+    sw = cv2.getTextSize(sub, cv2.FONT_HERSHEY_SIMPLEX, 0.36, 1)[0][0]
+    cv2.putText(frame, sub, (w//2 - sw//2, cy1 + 52),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.36,
                 tuple(int(c * alpha) for c in DIM), 1, cv2.LINE_AA)
-    cv2.line(frame, (cx1+16, cy1+64), (cx2-16, cy1+64), (55, 40, 80), 1, cv2.LINE_AA)
+    cv2.line(frame, (cx1 + 20, cy1 + 60), (cx2 - 20, cy1 + 60), (55, 45, 75), 1, cv2.LINE_AA)
 
-    # Two-column legend
-    col_w = cw // 2 - 10
+    # Two columns calculated symmetrically with equal margins
+    pad = 18
+    gap = 12
+    col_w = (cw - 2 * pad - gap) // 2
     entry_h = 36
+    ey = cy1 + 80
     entries = LEGEND
-    ey = cy1 + 82
     for i, (gname, gdesc, gcol) in enumerate(entries):
-        col_off = (i % 2) * (col_w + 16)
-        ex = cx1 + 16 + col_off
-        box_col = tuple(int(c * 0.35) for c in gcol)
-        cv2.rectangle(frame, (ex, ey - 14), (ex + col_w, ey + 16), box_col, -1)
-        cv2.rectangle(frame, (ex, ey - 14), (ex + col_w, ey + 16),
+        col_idx = i % 2
+        ex = cx1 + pad + col_idx * (col_w + gap)
+        box_col = tuple(int(c * 0.30) for c in gcol)
+        cv2.rectangle(frame, (ex, ey - 14), (ex + col_w, ey + 18), box_col, -1)
+        cv2.rectangle(frame, (ex, ey - 14), (ex + col_w, ey + 18),
                       tuple(int(c * alpha) for c in gcol), 1, cv2.LINE_AA)
         cv2.putText(frame, gname,
-                    (ex + 6, ey + 2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.38,
+                    (ex + 8, ey + 2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.36,
                     tuple(int(c * alpha) for c in gcol), 1, cv2.LINE_AA)
         cv2.putText(frame, gdesc,
-                    (ex + 6, ey + 14),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.32,
-                    tuple(int(c * alpha * 0.75) for c in WHITE), 1, cv2.LINE_AA)
-        if i % 2 == 1:
+                    (ex + 8, ey + 14),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.31,
+                    tuple(int(c * alpha * 0.8) for c in WHITE), 1, cv2.LINE_AA)
+        if col_idx == 1:
             ey += entry_h + 4
 
     # Countdown arc
-    rc, ry, rr = cx2 - 30, cy1 + 30, 20
+    rc, ry, rr = cx2 - 28, cy1 + 28, 16
     prog = max(0.0, remaining / ONBOARDING_SECS)
     ang = int(360 * (1.0 - prog))
     cv2.circle(frame, (rc, ry), rr, (40, 30, 60), 2, cv2.LINE_AA)
     if ang < 360:
         cv2.ellipse(frame, (rc, ry), (rr, rr), -90, 0, ang, col_a, 2, cv2.LINE_AA)
     stxt = str(int(math.ceil(remaining)))
-    stw = cv2.getTextSize(stxt, cv2.FONT_HERSHEY_SIMPLEX, 0.44, 1)[0][0]
-    cv2.putText(frame, stxt, (rc - stw//2, ry + 6),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.44, col_a, 1, cv2.LINE_AA)
+    stw = cv2.getTextSize(stxt, cv2.FONT_HERSHEY_SIMPLEX, 0.40, 1)[0][0]
+    cv2.putText(frame, stxt, (rc - stw//2, ry + 5),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.40, col_a, 1, cv2.LINE_AA)
 
     skip = "Press SPACE to skip"
-    skw = cv2.getTextSize(skip, cv2.FONT_HERSHEY_SIMPLEX, 0.36, 1)[0][0]
-    cv2.putText(frame, skip, (w//2 - skw//2, cy2 - 10),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.36,
+    skw = cv2.getTextSize(skip, cv2.FONT_HERSHEY_SIMPLEX, 0.34, 1)[0][0]
+    cv2.putText(frame, skip, (w//2 - skw//2, cy2 - 12),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.34,
                 tuple(int(c * alpha) for c in DIM), 1, cv2.LINE_AA)
 
 
@@ -434,13 +436,14 @@ def draw_hud(frame, tracking, gesture, status, action,
              fps, sens_name, conf, speed, state):
     h, w = frame.shape[:2]
 
-    # Left status card
-    glass_panel(frame, (10, 10), (262, 165))
-    cv2.putText(frame, "AEROCLICK", (20, 35),
-                cv2.FONT_HERSHEY_DUPLEX, 0.68, ACCENT, 1, cv2.LINE_AA)
-    cv2.putText(frame, f"[{sens_name}]", (155, 35),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.33, DIM, 1, cv2.LINE_AA)
-    cv2.line(frame, (18, 42), (254, 42), BORDER, 1, cv2.LINE_AA)
+    # 1. Left status card
+    glass_panel(frame, (10, 10), (252, 165))
+    cv2.circle(frame, (23, 29), 4, (0, 230, 255), -1, cv2.LINE_AA)
+    cv2.putText(frame, "AeroClick", (34, 35),
+                cv2.FONT_HERSHEY_DUPLEX, 0.65, ACCENT, 1, cv2.LINE_AA)
+    cv2.putText(frame, f"[{sens_name}]", (162, 34),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.34, (180, 160, 220), 1, cv2.LINE_AA)
+    cv2.line(frame, (18, 43), (244, 43), BORDER, 1, cv2.LINE_AA)
 
     rows = [
         ("Tracking", tracking,
@@ -449,69 +452,89 @@ def draw_hud(frame, tracking, gesture, status, action,
         ("Status",   status,   STATUS_COL.get(status,   WHITE)),
         ("Action",   action,   ACTION_COL.get(action,   DIM)),
     ]
-    ry = 62
+    ry = 63
     for lbl, val, col in rows:
         cv2.putText(frame, f"{lbl:<8}:", (20, ry),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, DIM, 1, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.40, DIM, 1, cv2.LINE_AA)
         thick = 2 if val not in ("NONE","NO HAND","IDLE") else 1
         cv2.putText(frame, val, (108, ry),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.44, col, thick, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, col, thick, cv2.LINE_AA)
         ry += 22
 
     cv2.putText(frame, "Conf", (20, ry + 4),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.33, DIM, 1, cv2.LINE_AA)
-    conf_bar(frame, 60, ry, 184, conf, GESTURE_COL.get(gesture, (60,200,80)))
+    conf_bar(frame, 60, ry, 175, conf, GESTURE_COL.get(gesture, (60,200,80)))
 
-    # Top-right info strip
-    xa = w - 8
-    for txt in [f"FPS {fps:4.0f}", f"Spd {speed:4.1f}", f"[{state}]"]:
-        tw = cv2.getTextSize(txt, cv2.FONT_HERSHEY_SIMPLEX, 0.37, 1)[0][0]
-        col = (0,165,255) if "DRAG" in txt else DIM
-        cv2.putText(frame, txt, (xa - tw, rows[0][0] and 24 or 0),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.37, col, 1, cv2.LINE_AA)
-        xa -= tw + 6  # horizontal strip — place right-aligned
-    # redo properly as vertical strip
-    ys = [22, 38, 54]
-    txts = [f"FPS {fps:.0f}", f"spd {speed:.1f}", f"[{state}]"]
-    for y_off, t in zip(ys, txts):
-        tw2 = cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, 0.37, 1)[0][0]
-        sc = (0,165,255) if state == "DRAGGING" else \
-             (0,200,255) if state == "DRAG_ARMED" else DIM
-        cv2.putText(frame, t, (w - tw2 - 8, y_off),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.37, sc, 1, cv2.LINE_AA)
+    # 2. Top-right telemetry panel (clean, no overlap)
+    rx1, ry1, rx2, ry2 = w - 105, 10, w - 10, 74
+    glass_panel(frame, (rx1, ry1), (rx2, ry2))
+    cv2.putText(frame, f"FPS  {fps:.0f}", (rx1 + 10, ry1 + 18),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.35, WHITE, 1, cv2.LINE_AA)
+    cv2.putText(frame, f"SPD  {speed:.1f}", (rx1 + 10, ry1 + 36),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.35, DIM, 1, cv2.LINE_AA)
+    state_col = (0, 165, 255) if state == "DRAGGING" else \
+                (0, 200, 255) if state == "DRAG_ARMED" else (0, 230, 255)
+    cv2.putText(frame, f"[{state}]", (rx1 + 10, ry1 + 54),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.35, state_col, 1, cv2.LINE_AA)
 
-    # Bottom-right gesture legend
-    lw, lh = 196, 148
-    lx, ly = w - lw - 8, h - lh - 8
-    glass_panel(frame, (lx, ly), (w-8, h-8))
-    cv2.putText(frame, "GESTURES", (lx+10, ly+16),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.36, DIM, 1, cv2.LINE_AA)
-    cv2.line(frame, (lx+8, ly+21), (w-10, ly+21), BORDER, 1, cv2.LINE_AA)
-    ey2 = ly + 35
+    # 3. Top-center action notification banner
+    if action and action != "NONE":
+        tw = cv2.getTextSize(action, cv2.FONT_HERSHEY_DUPLEX, 0.50, 1)[0][0]
+        bx = w // 2
+        act_col = ACTION_COL.get(action, ACCENT)
+        glass_panel(frame, (bx - tw//2 - 14, 12), (bx + tw//2 + 14, 40),
+                    bg=(30, 15, 45), bc=act_col)
+        cv2.putText(frame, action, (bx - tw//2, 30),
+                    cv2.FONT_HERSHEY_DUPLEX, 0.50, act_col, 1, cv2.LINE_AA)
+
+    # 4. Bottom-right gesture legend
+    lw, lh = 205, 168
+    lx, ly = w - lw - 10, h - lh - 12
+    glass_panel(frame, (lx, ly), (w - 10, h - 12))
+    cv2.putText(frame, "GESTURE GUIDE", (lx + 12, ly + 18),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.35, ACCENT, 1, cv2.LINE_AA)
+    cv2.line(frame, (lx + 10, ly + 24), (w - 12, ly + 24), BORDER, 1, cv2.LINE_AA)
+    ey2 = ly + 40
     for gn, gd, gc in LEGEND:
-        cv2.putText(frame, gn[:11], (lx+10, ey2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.32, gc, 1, cv2.LINE_AA)
-        cv2.putText(frame, gd, (lx+105, ey2),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.29,
-                    tuple(int(c*0.72) for c in WHITE), 1, cv2.LINE_AA)
-        ey2 += 13
+        cv2.circle(frame, (lx + 14, ey2 - 3), 3, gc, -1, cv2.LINE_AA)
+        cv2.putText(frame, gn[:11], (lx + 22, ey2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.31, gc, 1, cv2.LINE_AA)
+        cv2.putText(frame, gd, (lx + 106, ey2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.29, WHITE, 1, cv2.LINE_AA)
+        ey2 += 15
 
-    # Dashed interaction zone
-    bx1, by1, bx2, by2 = MARGIN_X, MARGIN_Y, w-MARGIN_X, h-MARGIN_Y
-    zc = (65, 55, 90)
-    d, g = 11, 5
-    for x in range(bx1, bx2, d+g):
-        cv2.line(frame,(x,by1),(min(x+d,bx2),by1),zc,1)
-        cv2.line(frame,(x,by2),(min(x+d,bx2),by2),zc,1)
-    for y in range(by1, by2, d+g):
-        cv2.line(frame,(bx1,y),(bx1,min(y+d,by2)),zc,1)
-        cv2.line(frame,(bx2,y),(bx2,min(y+d,by2)),zc,1)
+    # 5. Corner targeting brackets around interaction zone
+    bx1, by1, bx2, by2 = MARGIN_X, MARGIN_Y, w - MARGIN_X, h - MARGIN_Y
+    cl = 16
+    cc = (110, 80, 160)
+    # top-left
+    cv2.line(frame, (bx1, by1), (bx1 + cl, by1), cc, 2, cv2.LINE_AA)
+    cv2.line(frame, (bx1, by1), (bx1, by1 + cl), cc, 2, cv2.LINE_AA)
+    # top-right
+    cv2.line(frame, (bx2, by1), (bx2 - cl, by1), cc, 2, cv2.LINE_AA)
+    cv2.line(frame, (bx2, by1), (bx2, by1 + cl), cc, 2, cv2.LINE_AA)
+    # bottom-left
+    cv2.line(frame, (bx1, by2), (bx1 + cl, by2), cc, 2, cv2.LINE_AA)
+    cv2.line(frame, (bx1, by2), (bx1, by2 - cl), cc, 2, cv2.LINE_AA)
+    # bottom-right
+    cv2.line(frame, (bx2, by2), (bx2 - cl, by2), cc, 2, cv2.LINE_AA)
+    cv2.line(frame, (bx2, by2), (bx2, by2 - cl), cc, 2, cv2.LINE_AA)
+
+    # 6. Subtle dashed zone border
+    zc = (50, 42, 70)
+    d, g = 11, 6
+    for x in range(bx1 + cl, bx2 - cl, d+g):
+        cv2.line(frame, (x, by1), (min(x+d, bx2 - cl), by1), zc, 1)
+        cv2.line(frame, (x, by2), (min(x+d, bx2 - cl), by2), zc, 1)
+    for y in range(by1 + cl, by2 - cl, d+g):
+        cv2.line(frame, (bx1, y), (bx1, min(y+d, by2 - cl)), zc, 1)
+        cv2.line(frame, (bx2, y), (bx2, min(y+d, by2 - cl)), zc, 1)
 
     # Footer
     footer = "q = quit   |   +/- = sensitivity   |   SPACE = skip tutorial"
     fw = cv2.getTextSize(footer, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)[0][0]
-    cv2.putText(frame, footer, (w//2 - fw//2, h-6),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (70,70,70), 1, cv2.LINE_AA)
+    cv2.putText(frame, footer, (w//2 - fw//2, h - 7),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.35, (90, 90, 90), 1, cv2.LINE_AA)
 
 
 # ==============================================================================
